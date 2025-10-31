@@ -88,7 +88,7 @@ function App() {
     const firstGameIndex = lastGameIndex - gamesPerPage
     const currentGames = filteredGames.slice(firstGameIndex, lastGameIndex)
     const totalPages = Math.ceil(games.length / gamesPerPage)
-
+    const gameLink = `https://www.freetogame.com/open/${games.title}`
 
     const Pagination = ({ currentPage, totalPages, onPageChange}) => {
         if (totalPages <= 1) return null;
@@ -146,7 +146,7 @@ function App() {
                         ) : (
                         <img src={game.thumbnail} alt={game.title} loading="lazy"/>
                         )}
-                        <h3>{game.title}</h3>
+                        <a type="button" className="game-link-button" href={game.game_url} target="blank"><h3>{game.title}</h3></a>
                         <p>{game.short_description}</p>
                         <p><b>Платформа:</b> {game.platform}</p>
                     </div>)

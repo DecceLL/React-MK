@@ -110,3 +110,16 @@ select {
     border-color: #007bff;
     font-weight: bold;
 }
+
+.game-link-button {
+    color: #333333;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.game-link-button:hover {
+    color: #007bff;
+}
+.game-link-button:active {
+    color: #0056b3;
+}
