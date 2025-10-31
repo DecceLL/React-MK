@@ -9,9 +9,9 @@ function App() {
     const [category, setCategory] = useState("all");
     const [sort, setSort] = useState("all");
     const [currentPage, setCurrentPage] = useState(1);
-    const gamesPerPage = 12;
+    const gamesPerPage = 14;
     const [search, setSearch] = useState("");
-
+    const [hoverVideo, setHoverVideo] = useState(null);
 
     useEffect(() => {
         setLoading(true);
@@ -46,6 +46,7 @@ function App() {
         setPlatform("all");
         setCategory("all");
         setSort("all");
+        setSearch("")
     };
 
     const PlatformFilter = ({ value, onChange }) => (
@@ -87,6 +88,7 @@ function App() {
     const firstGameIndex = lastGameIndex - gamesPerPage
     const currentGames = filteredGames.slice(firstGameIndex, lastGameIndex)
     const totalPages = Math.ceil(games.length / gamesPerPage)
+
 
     const Pagination = ({ currentPage, totalPages, onPageChange}) => {
         if (totalPages <= 1) return null;
@@ -132,14 +134,23 @@ function App() {
                 <p className={"no-games"}>Нет игр для отображения</p>)}
 
             <div className={"games-grid"}>
-                {!loading && !error && currentGames.map((game) => (
-                <div className={"game-card"} key={game.id}>
-                    <img src={game.thumbnail} alt={game.title}/>
-                    <h3>{game.title}</h3>
-                    <p>{game.short_description}</p>
-                     <p><b>Платформа:</b> {game.platform}</p>
-                </div>
-        ))}
+                {currentGames.map((game) => {
+                    const videoSrc = `/g/${game.id}/videoplayback.webm`;
+                    return(
+                    <div className={"game-card"}
+                         key={game.id}
+                            onMouseEnter={() => setHoverVideo(videoSrc)}
+                            onMouseLeave={() => setHoverVideo(null)}>
+                        {hoverVideo === videoSrc ? (
+                            <video src={videoSrc} autoPlay muted/>
+                        ) : (
+                        <img src={game.thumbnail} alt={game.title} loading="lazy"/>
+                        )}
+                        <h3>{game.title}</h3>
+                        <p>{game.short_description}</p>
+                        <p><b>Платформа:</b> {game.platform}</p>
+                    </div>)
+                })}
             </div>
         </div>
 );
