@@ -10,6 +10,9 @@ function App() {
     const [sort, setSort] = useState("all");
     const [currentPage, setCurrentPage] = useState(1);
     const gamesPerPage = 12;
+    const [search, setSearch] = useState("");
+
+
     useEffect(() => {
         setLoading(true);
         setError(null);
@@ -79,11 +82,14 @@ function App() {
         </select>
     );
 
-
+    const filteredGames = games.filter((games) => games.title.toLowerCase().includes(search.toLowerCase()));
+    const lastGameIndex = currentPage * gamesPerPage
+    const firstGameIndex = lastGameIndex - gamesPerPage
+    const currentGames = filteredGames.slice(firstGameIndex, lastGameIndex)
+    const totalPages = Math.ceil(games.length / gamesPerPage)
 
     const Pagination = ({ currentPage, totalPages, onPageChange}) => {
-        if (totalPages <= 1)
-            return null;
+        if (totalPages <= 1) return null;
             const pages = Array.from({length: totalPages}, (_, i) => i + 1);
         return (
             <div className={"pagination"}>
@@ -92,6 +98,7 @@ function App() {
                         onClick={() => onPageChange(currentPage - 1)}>
                     Назад
                 </button>
+
                 {pages.map((page) => (
                     <button key={page}
                             className={`page-btn ${page === currentPage ? "active" : ""}`}
@@ -107,74 +114,34 @@ function App() {
             </div>
         )
     }
-    const lastGameIndex = currentPage * gamesPerPage
-    const firstGameIndex = lastGameIndex - gamesPerPage
-    const currentGames = games.slice(firstGameIndex, lastGameIndex)
-    const totalPages = Math.ceil(games.length / gamesPerPage)
 
     return (
-        <div className="mainStyle">
-            <h1 className="charge-name">Список игр</h1>
-            <div
-                style={{
-                    display: "flex",
-                    gap: "10px",
-                    justifyContent: "center",
-                    marginBottom: "20px",
-                    flexWrap: "wrap",
-                }}
-            >
+        <div className="app">
+            <h1>Список игр</h1>
+            <div className={"filters"}>
+                <input type={"text"} value={search} placeholder={"Поиск игры..."} onChange={(e) => setSearch(e.target.value)}/>
                 <PlatformFilter value={platform} onChange={setPlatform} />
                 <CategoryFilter value={category} onChange={setCategory} />
                 <SortFilter value={sort} onChange={setSort} />
                 <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
                 <button className={"reset-button"} onClick={resetFilters}>Сбросить фильтры</button>
-
             </div>
-
-            {loading && <p style={{ textAlign: "center" }}>Загрузка...</p>}
-            {error && <p style={{ color: "red", textAlign: "center" }}>{error}</p>}
+            {loading && <p className={"loading"}>Загрузка...</p>}
+            {error && <p className={"error"}>{error}</p>}
             {!loading && games.length === 0 && (
-                <p style={{ textAlign: "center" }}>Нет игр для отображения</p>
-            )}
+                <p className={"no-games"}>Нет игр для отображения</p>)}
 
-            <div
-                style={{
-                    display: "grid",
-                    gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))",
-                    gap: "15px",
-                }}
-            >
-                {!loading &&
-                    !error &&
-                    currentGames.map((game) => (
-                        <div
-                            key={game.id}
-                    style={{
-                    background: "#ccc",
-                    padding: "10px",
-                    borderRadius: "8px",
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "space-between",
-                }}
-                    >
-                    <img
-                    src={game.thumbnail}
-                    alt={game.title}
-                    style={{ width: "100%", borderRadius: "4px" }}
-                    />
+            <div className={"games-grid"}>
+                {!loading && !error && currentGames.map((game) => (
+                <div className={"game-card"} key={game.id}>
+                    <img src={game.thumbnail} alt={game.title}/>
                     <h3>{game.title}</h3>
-            <p style={{ fontSize: "14px", color: "#524d4d" }}>
-                {game.short_description}
-            </p>
-            <p style={{ marginTop: "auto", marginBottom: 0 }}>
-                <b>Платформа:</b> {game.platform}
-            </p>
+                    <p>{game.short_description}</p>
+                     <p><b>Платформа:</b> {game.platform}</p>
+                </div>
+        ))}
+            </div>
         </div>
-))}
-</div>
-</div>
 );
 }
 
