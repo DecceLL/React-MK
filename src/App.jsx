@@ -88,7 +88,6 @@ function App() {
     const firstGameIndex = lastGameIndex - gamesPerPage
     const currentGames = filteredGames.slice(firstGameIndex, lastGameIndex)
     const totalPages = Math.ceil(games.length / gamesPerPage)
-    const gameLink = `https://www.freetogame.com/open/${games.title}`
 
     const Pagination = ({ currentPage, totalPages, onPageChange}) => {
         if (totalPages <= 1) return null;
@@ -119,41 +118,47 @@ function App() {
 
     return (
         <div className="app">
+
             <h1>Список игр</h1>
             <div className={"filters"}>
-                <input type={"text"} value={search} placeholder={"Поиск игры..."} onChange={(e) => setSearch(e.target.value)}/>
-                <PlatformFilter value={platform} onChange={setPlatform} />
-                <CategoryFilter value={category} onChange={setCategory} />
-                <SortFilter value={sort} onChange={setSort} />
-                <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+                <input type={"text"} value={search} placeholder={"Поиск игры..."}
+                       onChange={(e) => setSearch(e.target.value)}/>
+                <PlatformFilter value={platform} onChange={setPlatform}/>
+                <CategoryFilter value={category} onChange={setCategory}/>
+                <SortFilter value={sort} onChange={setSort}/>
+                <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage}/>
                 <button className={"reset-button"} onClick={resetFilters}>Сбросить фильтры</button>
             </div>
-            {loading && <p className={"loading"}>Загрузка...</p>}
+            {loading && <p className={"loader"}>Загрузка...</p>}
             {error && <p className={"error"}>{error}</p>}
             {!loading && games.length === 0 && (
                 <p className={"no-games"}>Нет игр для отображения</p>)}
 
             <div className={"games-grid"}>
                 {currentGames.map((game) => {
-                    const videoSrc = `/g/${game.id}/videoplayback.webm`;
-                    return(
-                    <div className={"game-card"}
-                         key={game.id}
-                            onMouseEnter={() => setHoverVideo(videoSrc)}
-                            onMouseLeave={() => setHoverVideo(null)}>
-                        {hoverVideo === videoSrc ? (
-                            <video src={videoSrc} autoPlay muted/>
-                        ) : (
-                        <img src={game.thumbnail} alt={game.title} loading="lazy"/>
-                        )}
-                        <a type="button" className="game-link-button" href={game.game_url} target="blank"><h3>{game.title}</h3></a>
-                        <p>{game.short_description}</p>
-                        <p><b>Платформа:</b> {game.platform}</p>
-                    </div>)
+                    const videoSrc = [`/g/${game.id}/videoplayback.webm`, `/g/${game.id}/videoplayback.mp4`];
+                    return (
+                        <div className={"game-card"}
+                             key={game.id}
+                             onMouseEnter={() => setHoverVideo(game.id)}
+                             onMouseLeave={() => setHoverVideo(null)}>
+                            {hoverVideo === game.id ? (
+                                <video autoPlay muted loop playsInline>
+                                    <source src={videoSrc[0]} type="video/webm"/>
+                                    <source src={videoSrc[1]} type="video/mp4"/>
+                                </video>
+                            ) : (
+                                <img src={game.thumbnail} alt={game.title} loading="lazy"/>
+                            )}
+                            <a type="button" className="game-link-button" href={game.game_url} target="blank">
+                                <h3>{game.title}</h3></a>
+                            <p>{game.short_description}</p>
+                            <p><b>Платформа:</b> {game.platform}</p>
+                        </div>)
                 })}
             </div>
         </div>
-);
+    );
 }
 
 export default App;
